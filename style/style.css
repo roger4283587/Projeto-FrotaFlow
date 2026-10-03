@@ -19,6 +19,11 @@ body{
     background-color: var(--bg-grey-light);
 }
 
+body div input{
+    border: none;
+    border-radius: 5px;
+}
+
 
 
 .dark {
@@ -32,78 +37,118 @@ body{
 
 /* Header Vertical */
 header{
-  position: fixed; 
-  left: 0;
-  width: 230px; 
-  height: 100vh; 
-  color: white;
-  display: flex;
-  flex-direction: column; 
-  justify-content: space-between;
-  background-color: #0B2545;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    width: 230px;
+    height: 96vh;
+    background-color: #0B2545;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px;
+    padding: 5px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+    gap: 50px;
+    left: 0;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
 }
 
-
-header .funcoes ul {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column; 
-  gap: 15px; 
+#usuario{
+    width: 100%;
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    
 }
 
-header .funcoes ul li a {
-  color: white; 
-  text-decoration: none;
-  padding: 5px;
-  display: block;
+#usuario div{
+    font-size: 20px;
+    font-weight: bold;
+}
+#usuario div svg{
+    height: 50px;
+    width: 50px;
+    color: white;
 }
 
-header .funcoes ul li  :hover {
-    background-color:  #3A9BD5;
+#usuario div p{
+    font-size: 15px;
+    color: white;
 }
 
-header .login ul {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column; 
-  gap: 15px; 
+#navegacao{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+    
 }
 
-header .login ul li a {
-  color: white; 
-  text-decoration: none;
-  padding: 5px;
-  display: block;
+.botoes-nav{
+    height: 30px;
+    border-radius: 9px;
+    padding: 5px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-left: 15px;
+    gap: 10px;
+    font-weight: bold;
 }
 
-header .login ul li  :hover {
-    background-color:  #3A9BD5;
+.botoes-nav svg{
+    width: 20px;
+    height: 20px;
 }
 
-.item-login{
-    margin-bottom: 40px;
-}
-
-.logo{
-    margin-left: 10px;
-    margin-top: 15px;
-
-}
-
-.logo img{
-    width: 190px;
-    height: 54px;
-}
-
-.logo a{
-    color: white; 
+header a {
     text-decoration: none;
+    color: white;
+}
+
+.botoes-nav:hover{
+    background-color: rgb(49, 49, 49);
+    background-color: #1c5fa8;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+#login{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+    height: 100%;
+}
+
+.botoes-user{
+    height: 30px;
+    border-radius: 9px;
+    padding: 5px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-left: 15px;
+    gap: 10px;
+    font-weight: bold;
+}
+
+.botoes-user svg{
+    width: 20px;
+    height: 20px;
+}
+
+.botoes-user:hover{
+    background-color: rgb(49, 49, 49);
+    background-color: #1c5fa8;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
 }
 
 
@@ -111,7 +156,7 @@ header .login ul li  :hover {
 
 /* Main  */
 main {
-  margin-left: 225px; 
+  margin-left: 245px; 
   padding: 20px;
   display: grid;
 }
