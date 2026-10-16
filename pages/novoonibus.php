@@ -2,14 +2,12 @@
     session_start();
 
     $nomeRecebido = "Error";
-    $senhaRecebida = "Error";
 
-    if( isset($_SESSION["n"]) && isset($_SESSION["s"]) )
+    if( isset($_SESSION["n"]))
     {
-        if( $_SESSION["n"] != "" && $_SESSION["s"] != "" )
+        if( $_SESSION["n"] != "")
         {
             $nomeRecebido  = $_SESSION["n"];
-            $senhaRecebida = $_SESSION["s"];
         }
     } 
 ?>
@@ -79,7 +77,7 @@
                     <p>Login</p>
                 </div>
             </a>
-            <a href="sair.php">
+            <a href="../sessao/sair.php">
                 <div class="botoes-user">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0z"/>
@@ -109,7 +107,7 @@
             </div>
         </div>
 
-        <div class="cadastro-ordem">
+        <form class="cadastro-ordem" action="novoonibus.php" method="POST">
             <div class="linha-1" id="foto">
                     <div id="item-foto">
                         <p>Sem Foto</p>
@@ -119,19 +117,19 @@
             <div id="item-ordem-1">
                 <div class="linha-1">
                     <p>Placa</p>
-                    <input type="text">
+                    <input type="text" name="txtPlaca" required>
                 </div>
                 <div class="linha-1">
                     <p>Ano Fab.</p>
-                    <input type="text">
+                    <input type="year" name="txtAno" required>
                 </div>
                 <div class="linha-1">
                     <p>Km Atual</p>
-                    <input type="text">
+                    <input type="number" name="txtKm" required>
                 </div>
                 <div class="linha-1">
                     <p>Nº Chassi</p>
-                    <input type="text">
+                    <input type="text" name="txtChassi" required>
                 </div>
 
                 <div class="linha-1">
@@ -142,11 +140,11 @@
             <div id="item-ordem-2">
                 <div class="linha-2">
                     <p>Modelo</p>
-                    <input type="text">
+                    <input type="text" name="txtModelo" required>
                 </div>
                 <div class="linha-2">
                     <p>Data do Cadastro</p>
-                    <input type="date">
+                    <input type="date" name="txtDataCad" required>
                 </div>
             </div>
             <div id="item-ordem-3">
@@ -155,10 +153,10 @@
             </div>
             <div id="item-ordem-5">
                 <div id="button-cadastrar">
-                    <a href="/pages/cadastro_onibus.html"><button>Cadastrar</button></a>
+                    <a href="cadastro_onibus.php"><button><input id="cadastrar" type="submit"></button></a>
                 </div>
                 <div id="button-cancelar">
-                    <a href="/pages/cadastro_onibus.html"><button>Cancelar</button></a>
+                    <a href="cadastro_onibus.php"><button>Cancelar</button></a>
                 </div>
             </div>
         </div>
@@ -168,3 +166,12 @@
 
 </body>
 </html>
+
+<?php
+
+    $placa = $_POST["txtPlaca"];
+    $ano = $_POST["txtAno"];
+    $km = $_POST["txtKm"];
+    $chassi = $_POST["txtChassi"];
+
+?>

@@ -13,19 +13,19 @@
 
     <div class="item">
 
-        <form id="login" method="POST" action="recebe.php">
+        <form id="login" method="POST" action="../sessao/recebe.php">
 
             <h2>Login</h2>
 
-            <input type="text" name="txtUser" placeholder="Usuário">
+            <input type="text" name="txtUser" placeholder="Usuário" required>
 
-            <input type="password" name="txtSenha" placeholder="Senha">
+            <input type="password" name="txtSenha" placeholder="Senha" required>
 
             <input type="submit">
 
         </form>
         <div id="item-2">
-        <p>Não possui cadastro? <a href="cadastro_usuario.html">cadastrar</a></p>
+        <p>Não possui cadastro? <a href="cadastro_usuario.php">cadastrar</a></p>
         </div>
     </div>
 
