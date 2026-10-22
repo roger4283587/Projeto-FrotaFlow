@@ -10,7 +10,36 @@
             $nomeRecebido  = $_SESSION["n"];
         }
     } 
+
+    require_once "../database/conexao.php";
+    $sql = "SELECT
+                    onibus.id,
+                    onibus.placa,
+                    onibus.modelo,
+                    onibus.ano_fab,
+                    onibus.kilometragem,
+                    onibus.chassi,
+                    onibus.data_cadastro,
+                    montadora.nome
+            FROM
+                onibus INNER JOIN montadora
+                ON montadora.id = onibus.id_montadora
+    ";
+
+    $params = [];
+
+    $filtro = trim($_GET["txtFiltro"] ?? "");
+    if ($filtro !== "") {
+        $sql .= " WHERE onibus.placa LIKE :filtro";
+        $params["filtro"] = "%" . $filtro . "%";
+    }
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    $onibuss = $stmt->fetchAll();
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -77,7 +106,7 @@
                     <p>Login</p>
                 </div>
             </a>
-            <a href="../sessao/sair.php">
+            <a href="../database/sair.php">
                 <div class="botoes-user">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0z"/>
@@ -108,23 +137,29 @@
         </div>
 
         <div class="info-container">
-            <div class="itens-info" id="placa">
-                <p>Placa:</p>
-                <input type="text">
-            </div>
-            <div class="container-button">
-                <div class="itens-info" id="botao-filtrar">
-                    <button>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-                        </svg>
-                        &nbsp;Filtrar
-                    </button>
+
+                <form action="cadastro_onibus.php" method="GET">
+                <div class="container-button">
+                    <div class="itens-info" id="placa-info">
+                    
+                        <p>Placa:</p>
+                        <input type="text" name="txtFiltro" placeholder="Ex: ABC1D23">
+                    
+                    </div>
+                    <div class="itens-info" id="botao-filtrar">
+                        <button>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                            </svg>
+                            &nbsp;Filtrar
+                        </button>
+                    </div>
                 </div>
+                </form>
                 <div class="itens-info" id="botao-ordem">
+                    <a href="montadora.php"><button>Montadora</button></a>
                     <a href="novoonibus.php"><button>Novo Ônibus</button></a>
                 </div>
-            </div>    
         </div>
 
         <div class="tabela2">
@@ -132,41 +167,48 @@
                 <tr>
                     <th>Placa</th>
                     <th>Modelo</th>
-                    <th>Montadora</th>
                     <th>Ano Fab.</th>
-                    <th>Ano Mod.</th>
                     <th>Km</th>
                     <th>Chassi</th>
+                    <th>Montadora</th>
                     <th>Data Cad.</th>
                     <th>Ações</th>
                 </tr>
 
-                <tr>
-                    <td>JKL-3456</td>
-                    <td>Paradiso</td>
-                    <td>Marcopolo</td>
-                    <td>2020</td>
-                    <td>2021</td>
-                    <td>120.000 km</td>
-                    <td>9BD34567890123456</td>
-                    <td>15/02/2024</td>
-                    <td><a href="/pages/novoonibus.html"><button class="ver"> Ver </button></a> <a href="/pages/onibus_editar.html"><button class="editar"> Editar</button></a> <button class="excluir">Excluir</button></td>
-                </tr>
+                <?php 
+                foreach($onibuss as $onibus){
+                    echo"<tr>";
+                    echo"<td>".$onibus["placa"]."</td>".
+                        "<td>".$onibus["modelo"]."</td>".
+                        "<td>".$onibus["ano_fab"]."</td>".
+                        "<td>".$onibus["kilometragem"]."</td>".
+                        "<td>".$onibus["chassi"]."</td>".
+                        "<td>".$onibus["nome"]."</td>".
+                        "<td>".$onibus["data_cadastro"]."</td>";
+                    echo"<td>";
+                    echo "<a href='CRUD/edtonibus.php?id=" . urlencode($onibus['id']) 
+                    ."&placa=" . urlencode($onibus['placa']) 
+                    ."&modelo=" . urlencode($onibus['modelo'])
+                    ."&ano_fab=" . urlencode($onibus['ano_fab'])
+                    ."&kilometragem=" . urlencode($onibus['kilometragem'])
+                    ."&chassi=" . urlencode($onibus['chassi'])
+                    ."&nome=" . urlencode($onibus['nome'])
+                    ."&data_cadastro=" . urlencode($onibus['data_cadastro']) ."'>";
+                    echo"<button class='editar'> Editar</button>";
+                    echo"</a>";
+                    echo "<a href='CRUD/exconibus.php?id=" . urlencode($onibus['id']) . "'>";
+                    echo "<button type='button' class='excluir'>Excluir</button>";
+                    echo "</a>";
+                    echo"</td>";
+                    echo "</tr>";
 
-                <tr>
-                    <td>GHI-9012</td>
-                    <td>O500</td>
-                    <td>Mercedes-Benz</td>
-                    <td>2023</td>
-                    <td>2024</td>
-                    <td>12.000 km</td>
-                    <td>9BD90123456789012</td>
-                    <td>10/02/2024</td>
-                    <td><a href="/pages/novoonibus.html"><button class="ver"> Ver </button></a> <a href="/pages/onibus_editar.html"><button class="editar"> Editar</button></a> <button class="excluir">Excluir</button></td>
-                </tr>
+                }
+                ?>
             </table>
         </div>
     </main>  
     <script src="../script/script.js"></script> 
 </body>
 </html>
+
+

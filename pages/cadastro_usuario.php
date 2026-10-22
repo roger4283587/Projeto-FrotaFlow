@@ -3,7 +3,7 @@
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    require_once "../conexao/conexao.php";
+    require_once "../database/conexao.php";
 
     $nome = $_POST["nome"] ?? "";
     $email = $_POST["email"] ?? "";

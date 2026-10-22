@@ -10,6 +10,15 @@
             $nomeRecebido  = $_SESSION["n"];
         }
     } 
+
+    require_once "../database/conexao.php";
+
+    $sql = "SELECT id, nome FROM montadora";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+
+    $montadoras = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -77,7 +86,7 @@
                     <p>Login</p>
                 </div>
             </a>
-            <a href="../sessao/sair.php">
+            <a href="../database/sair.php">
                 <div class="botoes-user">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0z"/>
@@ -117,49 +126,52 @@
             <div id="item-ordem-1">
                 <div class="linha-1">
                     <p>Placa</p>
-                    <input type="text" name="txtPlaca" required>
+                    <input type="text" name="txtPlaca" placeholder="Ex: ABC1D23" maxlength="8" required >
                 </div>
                 <div class="linha-1">
                     <p>Ano Fab.</p>
-                    <input type="year" name="txtAno" required>
+                    <input type="date" name="txtAno"  required >
                 </div>
                 <div class="linha-1">
                     <p>Km Atual</p>
-                    <input type="number" name="txtKm" required>
+                    <input type="number" name="txtKm" placeholder="Ex: 45000" minlength="0" maxlength="17" required >
                 </div>
                 <div class="linha-1">
                     <p>Nº Chassi</p>
-                    <input type="text" name="txtChassi" required>
+                    <input type="text" name="txtChassi" placeholder="Ex: 9BM384078NB123456" maxlength="17" required >
                 </div>
 
                 <div class="linha-1">
                     <p>Montadora</p>
-                <input type="text">
+                    <select name="txtMontadora" id="montadora" required>
+                        <option value="">Selecione uma montadora</option>
+                        <?php 
+                        foreach($montadoras as $montadora){
+                            echo"<option value='".$montadora["id"] ."'>".$montadora["nome"].  "</option>";
+                        }
+                        ?>
+                    </select>
                 </div>
             </div>
             <div id="item-ordem-2">
                 <div class="linha-2">
                     <p>Modelo</p>
-                    <input type="text" name="txtModelo" required>
+                    <input type="text" name="txtModelo" placeholder="Ex: OF-1721" required>
                 </div>
                 <div class="linha-2">
                     <p>Data do Cadastro</p>
                     <input type="date" name="txtDataCad" required>
                 </div>
             </div>
-            <div id="item-ordem-3">
-                <p>Observações</p>
-                <textarea name="" id=""></textarea>
-            </div>
             <div id="item-ordem-5">
                 <div id="button-cadastrar">
-                    <a href="cadastro_onibus.php"><button><input id="cadastrar" type="submit"></button></a>
+                    <a href="cadastro_onibus.php"><button type="submit">Cadastrar</button></a>
                 </div>
                 <div id="button-cancelar">
-                    <a href="cadastro_onibus.php"><button>Cancelar</button></a>
+                        <a href="cadastro_onibus.php"><div id="cancelar">Cancelar</div></a>
                 </div>
             </div>
-        </div>
+    </form>
 
     </main>  
     <script src="../script/script.js"></script>  
@@ -169,9 +181,30 @@
 
 <?php
 
-    $placa = $_POST["txtPlaca"];
-    $ano = $_POST["txtAno"];
-    $km = $_POST["txtKm"];
-    $chassi = $_POST["txtChassi"];
+    
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $placa = $_POST["txtPlaca"] ?? "";
+    $ano = $_POST["txtAno"] ?? "";
+    $km = $_POST["txtKm"] ?? "";
+    $chassi = $_POST["txtChassi"] ?? "";
+    $modelo = $_POST["txtModelo"] ?? "";
+    $dataCad = $_POST["txtDataCad"] ?? "";
+    $montadora = $_POST["txtMontadora"] ?? "";
+
+    $sql = "INSERT INTO onibus (placa, modelo, id_montadora, ano_fab, kilometragem, chassi, data_cadastro)
+            VALUES (:placa, :modelo, :montadora, :ano_fab, :kilometragem, :chassi, :data_cadastro)";
+
+    $stmt = $pdo ->prepare($sql);
+    
+    $stmt->execute([
+        "placa" => $placa,
+        "modelo" => $modelo,
+        "montadora" => $montadora,
+        "ano_fab" => $ano,
+        "kilometragem" => $km,
+        "chassi" => $chassi,
+        "data_cadastro" => $dataCad
+    ]);
+}
 
 ?>

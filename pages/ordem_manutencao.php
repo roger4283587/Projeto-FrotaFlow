@@ -10,6 +10,56 @@
             $nomeRecebido  = $_SESSION["n"];
         }
     } 
+
+
+
+    require_once "../database/conexao.php";
+
+    $stmt = $pdo->prepare("SELECT id, statusM FROM statusManutencao");
+    $stmt->execute();
+    $listaStatus = $stmt->fetchAll();
+
+    $sql = "SELECT
+            manutencao.id,
+            onibus.placa,
+            onibus.modelo,
+            manutencao.descricao,
+            statusManutencao.statusM,
+            onibus.chassi,
+            usuario.nome,
+            tipo_manutencao.tipos,
+            manutencao.data_fim
+        FROM manutencao
+        INNER JOIN onibus ON onibus.id = manutencao.id_onibus
+        INNER JOIN statusManutencao ON statusManutencao.id = manutencao.id_statusManutencao
+        INNER JOIN tipo_manutencao ON tipo_manutencao.id = manutencao.id_tipoManutencao
+        LEFT JOIN mecanico_manutencao ON mecanico_manutencao.id_manutencao = manutencao.id
+        LEFT JOIN usuario ON usuario.id = mecanico_manutencao.id_usuario";
+
+    $where  = [];
+    $params = [];
+
+    $filtro = trim($_GET["txtFiltro"] ?? "");
+    if ($filtro !== "") {
+        $where[] = "onibus.placa LIKE :filtro";
+        $params[":filtro"] = "%" . $filtro . "%";
+    }
+
+    $statusSel = trim($_GET["txtStatus"] ?? "");
+    if ($statusSel !== "") {
+        $where[] = "manutencao.id_statusManutencao = :status";
+        $params[":status"] = $statusSel;
+    }
+
+    if ($where) {
+        $sql .= " WHERE " . implode(" AND ", $where);
+    }
+
+    $sql .= " ORDER BY manutencao.id DESC";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    $manutencoes = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -77,7 +127,7 @@
                     <p>Login</p>
                 </div>
             </a>
-            <a href="../sessao/sair.php">
+            <a href="../database/sair.php">
                 <div class="botoes-user">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0z"/>
@@ -109,23 +159,35 @@
         </div>
 
         <div class="info-container">
-            <div class="itens-info" id="placa">
-                <p>Placa:</p>
-                <input type="text">
-            </div>
-            <div class="itens-info" id="status" >
-                <p>Status: </p>
-                <input type="text">
-            </div>
-            <div class="container-button">
-                <div class="itens-info" id="botao-filtrar">
-                    <button>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-                        </svg>
-                        &nbsp;Filtrar
-                    </button>
+            <form action="ordem_manutencao.php" method="GET">
+                <div class="container-button">
+                    <div class="itens-info" id="placa-info">
+                    
+                        <p>Placa:</p>
+                         <input type="text" name="txtFiltro" placeholder="Ex: ABC1D23"
+                            value="<?= htmlspecialchars($filtro) ?>">
+                    </div>
+                    <div class="itens-info" id="placa-info">
+                        <p>Status:</p>
+                        <select name="txtStatus" id="status">
+                            <option value="">Todos</option>
+                            <?php foreach ($listaStatus as $s): ?>
+                                <option value="<?= $s['id'] ?>" <?= $statusSel == $s['id'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($s['statusM']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="itens-info" id="botao-filtrar">
+                        <button>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                            </svg>
+                            &nbsp;Filtrar
+                        </button>
+                    </div>
                 </div>
+            </form>
                 <div class="itens-info" id="botao-ordem">
                     <a href="novaordem.php"><button>Nova Ordem</button></a>
                 </div>
@@ -141,31 +203,41 @@
                     <th>Problema</th>
                     <th>Status</th>
                     <th>Mecânico</th>
-                    <th>Data</th>
+                    <th>Tipo</th>
+                    <th>Data Fim</th>
                     <th>Ações</th>
                 </tr>
+                
+                <?php 
+                foreach($manutencoes as $manutencao){
+                    echo"<tr>";
+                    echo"<td>".$manutencao["id"]."</td>".
+                        "<td>".$manutencao["placa"]."</td>".
+                        "<td>".$manutencao["modelo"]."</td>".
+                        "<td>".$manutencao["descricao"]."</td>".
+                        "<td>".$manutencao["statusM"]."</td>".
+                        "<td>".$manutencao["nome"]."</td>".
+                        "<td>".$manutencao["tipos"]."</td>".
+                        "<td>".$manutencao["data_fim"]."</td>";
+                    echo"<td>";
+                    echo "<a href='CRUD/edtmanutencao.php?id=" . urlencode($manutencao['id']) 
+                    ."&placa=" . urlencode($manutencao['placa']) 
+                    ."&modelo=" . urlencode($manutencao['modelo'])
+                    ."&ano_fab=" . urlencode($manutencao['descricao'])
+                    ."&kilometragem=" . urlencode($manutencao['statusM'])
+                    ."&chassi=" . urlencode($manutencao['nome'])
+                    ."&nome=" . urlencode($manutencao['data_fim']) ."'>";
+                    echo"<button class='editar'> Editar</button>";
+                    echo"</a>";
+                    echo "<a href='CRUD/excmanutencao.php?id=" . urlencode($manutencao['id']) . "'>";
+                    echo "<button type='button' class='excluir'>Excluir</button>";
+                    echo "</a>";
+                    echo"</td>";
+                    echo "</tr>";
 
-                <tr>
-                    <td>#1019</td>
-                    <td>DEF-5678</td>
-                    <td>O500</td>
-                    <td>Troca de pneus traseiros</td>
-                    <td> Concluído </td>
-                    <td>Roberto Santos</td>
-                    <td>20/04/2024</td>
-                    <td><a href="/pages/novaordem.html"><button class="ver"> Ver </button></a> <a href="/pages/manutencao_editar.html"><button class="editar"> Editar</button></a> <button class="excluir">Excluir</button></td>
-                </tr>
+                }
+                ?>
 
-                <tr>
-                    <td>#1019</td>
-                    <td>DEF-5678</td>
-                    <td>O500</td>
-                    <td>Troca de pneus traseiros</td>
-                    <td> Concluído </td>
-                    <td>Roberto Santos</td>
-                    <td>20/04/2024</td>
-                    <td><a href="/pages/novaordem.html"><button class="ver"> Ver </button></a> <a href="/pages/manutencao_editar.html"><button class="editar"> Editar</button></a> <button class="excluir">Excluir</button></td>
-                </tr>
             </table>
         </div>
     </main>

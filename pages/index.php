@@ -13,7 +13,7 @@
 
     <div class="item">
 
-        <form id="login" method="POST" action="../sessao/recebe.php">
+        <form id="login" method="POST" action="../database/recebe.php">
 
             <h2>Login</h2>
 
